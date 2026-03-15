@@ -145,7 +145,7 @@ def check():
     new_items = []
 
     for label, queries in SEARCH_GROUPS.items():
-    for term in queries:
+        for term in queries:
 
         items = search_ebay(term, token)
 
