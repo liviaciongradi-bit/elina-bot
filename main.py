@@ -19,12 +19,29 @@ TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 # =========================
 # SEARCH TERMS
 # =========================
-SEARCH_TERMS = [
-    "Barbie Fairytopia Elina -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts -custom -repaint -reroot",
-    "Barbie Fairytopia Elina NRFB -broken -repair -OOAK -nude -damaged -incomplete -missing",
-    "Fairytopia Elina Mattel -broken -repair -OOAK -nude -damaged -incomplete -missing",
-    "Elina doll Mattel Fairytopia -broken -repair -OOAK -nude -damaged -incomplete -missing"
-]
+SEARCH_GROUPS = {
+    "ELINA": [
+        "Barbie Fairytopia Elina -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts -custom -repaint -reroot",
+        "Barbie Fairytopia Elina NRFB -broken -repair -OOAK -nude -damaged -incomplete -missing",
+        "Fairytopia Elina Mattel -broken -repair -OOAK -nude -damaged -incomplete -missing",
+        "Elina doll Mattel Fairytopia -broken -repair -OOAK -nude -damaged -incomplete -missing",
+        "Barbie Elina -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts"
+    ],
+
+    "CLARA": [
+        "Barbie Clara Nutcracker -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts",
+        "Barbie Clara Nutcracker NRFB -broken -repair -OOAK -nude -damaged -incomplete -missing",
+        "Nutcracker Clara Barbie Mattel -broken -repair -OOAK -nude -damaged -incomplete -missing",
+        "Barbie Clara -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts"
+    ],
+
+    "ERIKA": [
+        "Barbie Princess and the Pauper Erika -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts",
+        "Barbie Erika Princess and the Pauper NRFB -broken -repair -OOAK -nude -damaged -incomplete -missing",
+        "Mattel Erika Princess Pauper Barbie -broken -repair -OOAK -nude -damaged -incomplete -missing",
+        "Barbie Erika -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts"
+    ]
+}
 
 SEEN_FILE = Path(__file__).with_name("seen_items.json")
 
@@ -127,7 +144,8 @@ def check():
 
     new_items = []
 
-    for term in SEARCH_TERMS:
+    for label, queries in SEARCH_GROUPS.items():
+    for term in queries:
 
         items = search_ebay(term, token)
 
@@ -152,7 +170,7 @@ def check():
                 link = item["itemWebUrl"]
 
                 message = f"""
-🧚 NEW ELINA FOUND
+🧚 NEW {label} FOUND
 
 Title:
 {title}
