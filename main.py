@@ -20,12 +20,10 @@ TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 # SEARCH TERMS
 # =========================
 SEARCH_TERMS = [
-    "Barbie Fairytopia Elina",
-    "Barbie Fairytopia Elina NRFB",
-    "Fairytopia Elina",
-    "Elina doll Mattel",
-    "Barbie Elina Fairytopia",
-    "Mattel Fairytopia Elina"
+    "Barbie Fairytopia Elina NRFB mint boxed -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts -custom -repaint -reroot",
+    "Fairytopia Elina Mattel mint boxed -broken -repair -OOAK -nude -damaged -incomplete -missing -lot -parts",
+    "Barbie Fairytopia Elina Mattel NRFB -broken -repair -OOAK -nude -damaged -incomplete -missing",
+    "Elina doll Mattel Fairytopia boxed mint -broken -repair -OOAK -nude -damaged -incomplete -missing"
 ]
 
 SEEN_FILE = Path(__file__).with_name("seen_items.json")
