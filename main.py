@@ -149,11 +149,9 @@ def check():
             items = search_ebay(term, token)
 
             for item in items:
-
-            item_id = item["itemId"]
+                item_id = item["itemId"]
 
             if item_id not in seen:
-
                 title = item["title"]
 
                 price_info = item.get("price")
