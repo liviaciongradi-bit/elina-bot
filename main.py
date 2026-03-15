@@ -167,9 +167,9 @@ Link:
 {link}
 """
 
-                new_items.append(message)
+            new_items.append(message)
 
-                seen.add(item_id)
+            seen.add(item_id)
 
     save_seen(seen)
 
