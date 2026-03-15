@@ -148,6 +148,8 @@ def check():
                 else:
                     price = "No price"
                     currency = ""
+                if price_info and float(price) < 40:
+                    continue
 
                 link = item["itemWebUrl"]
 
