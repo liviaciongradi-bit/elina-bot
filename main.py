@@ -137,23 +137,24 @@ def check():
 
             item_id = item["itemId"]
 
-            if item_id not in seen:
+            if item_id in seen:
+                continue
 
-                title = item["title"]
+            title = item["title"]
 
-                price_info = item.get("price")
-                if price_info:
-                    price = price_info.get("value", "?")
-                    currency = price_info.get("currency", "")
-                else:
-                    price = "No price"
-                    currency = ""
-                if price_info and float(price) < 40:
-                    continue
+            price_info = item.get("price")
+            if price_info:
+                price = price_info.get("value", "?")
+                currency = price_info.get("currency", "")
+            else:
+                price = "No price"
+                currency = ""
+            if price_info and float(price) < 100:
+                continue
 
-                link = item["itemWebUrl"]
+            link = item["itemWebUrl"]
 
-                message = f"""
+            message = f"""
 🧚 NEW ELINA FOUND
 
 Title:
