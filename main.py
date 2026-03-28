@@ -122,19 +122,15 @@ def search_ebay(query, token):
 # MAIN CHECK
 # =========================
 def check():
-
     token = get_ebay_token()
-
     seen = load_seen()
-
     new_items = []
 
+    # ===== ELINA SEARCH =====
     for term in SEARCH_TERMS:
-
         items = search_ebay(term, token)
 
         for item in items:
-
             item_id = item["itemId"]
 
             if item_id in seen:
@@ -149,13 +145,13 @@ def check():
             else:
                 price = "No price"
                 currency = ""
+
             if price_info and float(price) < 100:
                 continue
 
             link = item["itemWebUrl"]
 
-            message = f"""
-🧚 NEW ELINA FOUND
+            message = f"""✨ NEW ELINA FOUND
 
 Title:
 {title}
@@ -168,43 +164,44 @@ Link:
 """
 
             new_items.append(message)
-
             seen.add(item_id)
-# ===== SELLER WATCH =====
-seller_items = search_ebay("Barbie", token)
 
-for item in seller_items:
-    item_id = item["itemId"]
+    # ===== SELLER WATCH =====
+    seller_items = search_ebay("Barbie", token)
 
-    if item_id in seen:
-        continue
+    for item in seller_items:
+        item_id = item["itemId"]
 
-    seller = item.get("seller", {}).get("username", "")
+        if item_id in seen:
+            continue
 
-    if seller.lower() != "carolina-8991":
-        continue
+        seller = item.get("seller", {}).get("username", "")
 
-    title = item.get("title", "No title")
+        if seller.lower() != "carolina-8991":
+            continue
 
-    price_info = item.get("price")
-    if price_info:
-        price = price_info.get("value", "?")
-        currency = price_info.get("currency", "")
-    else:
-        price = "No price"
-        currency = ""
+        title = item.get("title", "No title")
 
-    link = item.get("itemWebUrl", "")
+        price_info = item.get("price")
+        if price_info:
+            price = price_info.get("value", "?")
+            currency = price_info.get("currency", "")
+        else:
+            price = "No price"
+            currency = ""
 
-    message = f"""👀 NEW FROM SELLER
+        link = item.get("itemWebUrl", "")
+
+        message = f"""👀 NEW FROM SELLER
 
 {title}
 {price} {currency}
 {link}
 """
 
-    new_items.append(message)
-    seen.add(item_id)
+        new_items.append(message)
+        seen.add(item_id)
+
     save_seen(seen)
 
     for m in new_items:
@@ -215,13 +212,9 @@ for item in seller_items:
 # LOOP
 # =========================
 while True:
-
     try:
-
         check()
-
     except Exception as e:
-
         print("Error:", e)
 
     time.sleep(60)
