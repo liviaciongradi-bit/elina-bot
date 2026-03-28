@@ -177,8 +177,8 @@ Link:
 
         seller = item.get("seller", {}).get("username", "")
 
-        if seller.lower() != "carolina-8991":
-            continue
+        #if seller.lower() != "carolina-8991":
+        #    continue
 
         title = item.get("title", "No title")
 
