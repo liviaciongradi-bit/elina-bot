@@ -102,8 +102,8 @@ def search_ebay(query, token):
     r = requests.get(url, headers=headers, params=params)
 
     if r.status_code == 429:
-        send_telegram("⚠️ eBay rate limit hit (429). Waiting and trying again later.")
-        time.sleep(120)
+        print("eBay rate limit hit (429). Waiting...", flush=True)
+        time.sleep(900)
         return []
 
     data = r.json()
@@ -165,6 +165,13 @@ Link:
 # =========================
 send_telegram("✅ Elina bot started.")
 
+while True:
+    try:
+        check()
+    except Exception as e:
+        print("Bot error:", e, flush=True)
+
+    time.sleep(900)
 while True:
     try:
         check()
