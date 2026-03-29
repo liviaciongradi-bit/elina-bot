@@ -120,29 +120,27 @@ def check():
     seen = load_seen()
     new_items = []
 
-    # ===== ELINA SEARCH =====
     for term in SEARCH_TERMS:
         items = search_ebay(term, token)
 
         for item in items:
             item_id = item["itemId"]
 
-            if item_id in seen:
-                continue
+            if item_id not in seen:
+                title = item["title"]
 
-            title = item["title"]
+                price_info = item.get("price")
+                if price_info:
+                    price = price_info.get("value", "?")
+                    currency = price_info.get("currency", "")
+                else:
+                    price = "No price"
+                    currency = ""
 
-            price_info = item.get("price")
-            if price_info:
-                price = price_info.get("value", "?")
-                currency = price_info.get("currency", "")
-            else:
-                price = "No price"
-                currency = ""
+                link = item["itemWebUrl"]
 
-            link = item["itemWebUrl"]
-
-            message = f"""🧚 NEW ELINA FOUND
+                message = f"""
+🧚 NEW ELINA FOUND
 
 Title:
 {title}
@@ -154,44 +152,8 @@ Link:
 {link}
 """
 
-            new_items.append(message)
-            seen.add(item_id)
-
-    # ===== SELLER WATCH =====
-    seller_items = search_ebay("Barbie", token)
-
-    for item in seller_items:
-        item_id = item["itemId"]
-
-        if item_id in seen:
-            continue
-
-        seller = item.get("seller", {}).get("username", "")
-
-        if seller.lower() != "carolina-8991":
-            continue
-
-        title = item.get("title", "No title")
-
-        price_info = item.get("price")
-        if price_info:
-            price = price_info.get("value", "?")
-            currency = price_info.get("currency", "")
-        else:
-            price = "No price"
-            currency = ""
-
-        link = item.get("itemWebUrl", "")
-
-        message = f"""👀 NEW FROM SELLER
-
-{title}
-{price} {currency}
-{link}
-"""
-
-        new_items.append(message)
-        seen.add(item_id)
+                new_items.append(message)
+                seen.add(item_id)
 
     save_seen(seen)
 
