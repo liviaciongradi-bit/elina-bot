@@ -122,6 +122,7 @@ def search_ebay(query, token):
 # MAIN CHECK
 # =========================
 def check():
+    send_telegram("TEST")
 
     token = get_ebay_token()
 
