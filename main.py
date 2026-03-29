@@ -74,18 +74,8 @@ def get_ebay_token():
 # LOAD SEEN ITEMS
 # =========================
 def load_seen():
-
-    if not SEEN_FILE.exists():
-        return set()
-
-    try:
-        data = json.loads(SEEN_FILE.read_text())
-        return set(data)
-
-    except:
-        return set()
-
-
+    return set()
+   
 def save_seen(seen):
 
     SEEN_FILE.write_text(
