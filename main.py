@@ -19,6 +19,7 @@ TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 # =========================
 # SEARCH TERMS
 # =========================
+
 SEARCH_TERMS = [
     "Barbie Fairytopia Elina",
     "Barbie Fairytopia Elina NRFB",
@@ -148,6 +149,8 @@ def check():
                 else:
                     price = "No price"
                     currency = ""
+                if price_info and float(price) < 40:
+                    continue
 
                 link = item["itemWebUrl"]
 
@@ -188,4 +191,3 @@ while True:
         print("Error:", e)
 
     time.sleep(60)
-
