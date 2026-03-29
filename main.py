@@ -19,7 +19,6 @@ TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 # =========================
 # SEARCH TERMS
 # =========================
-
 SEARCH_TERMS = [
     "Barbie Fairytopia Elina",
     "Barbie Fairytopia Elina NRFB",
@@ -38,7 +37,7 @@ SEEN_FILE = Path(__file__).with_name("seen_items.json")
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
-    requests.post(
+    r = requests.post(
         url,
         data={
             "chat_id": TELEGRAM_CHAT_ID,
@@ -47,12 +46,14 @@ def send_telegram(text):
         }
     )
 
+    print("Telegram status:", r.status_code)
+    print("Telegram response:", r.text)
+
 
 # =========================
 # EBAY TOKEN
 # =========================
 def get_ebay_token():
-
     url = "https://api.ebay.com/identity/v1/oauth2/token"
 
     r = requests.post(
@@ -67,6 +68,10 @@ def get_ebay_token():
         }
     )
 
+    print("eBay token status:", r.status_code)
+    print("eBay token response:", r.text)
+
+    r.raise_for_status()
     return r.json()["access_token"]
 
 
@@ -74,20 +79,18 @@ def get_ebay_token():
 # LOAD SEEN ITEMS
 # =========================
 def load_seen():
+    # TEMPORARY RESET MODE FOR TESTING
     return set()
-   
-def save_seen(seen):
 
-    SEEN_FILE.write_text(
-        json.dumps(list(seen))
-    )
+
+def save_seen(seen):
+    SEEN_FILE.write_text(json.dumps(list(seen)))
 
 
 # =========================
 # EBAY SEARCH
 # =========================
 def search_ebay(query, token):
-
     url = "https://api.ebay.com/buy/browse/v1/item_summary/search"
 
     headers = {
@@ -104,31 +107,41 @@ def search_ebay(query, token):
 
     r = requests.get(url, headers=headers, params=params)
 
-    data = r.json()
+    print("\n=========================")
+    print("QUERY:", query)
+    print("SEARCH STATUS:", r.status_code)
+    print("SEARCH URL:", r.url)
+    print("SEARCH RESPONSE:", r.text[:1000])
 
-    return data.get("itemSummaries", [])
+    r.raise_for_status()
+
+    data = r.json()
+    items = data.get("itemSummaries", [])
+
+    print("RESULT COUNT:", len(items))
+
+    return items
 
 
 # =========================
 # MAIN CHECK
 # =========================
 def check():
-
     token = get_ebay_token()
-
     seen = load_seen()
 
+    print("Seen count at start:", len(seen))
+
     new_items = []
+
     for term in SEARCH_TERMS:
         items = search_ebay(term, token)
 
         for item in items:
-
             item_id = item["itemId"]
 
             if item_id not in seen:
-
-                title = item["title"]
+                title = item.get("title", "No title")
 
                 price_info = item.get("price")
                 if price_info:
@@ -137,12 +150,10 @@ def check():
                 else:
                     price = "No price"
                     currency = ""
-                
 
-                link = item["itemWebUrl"]
+                link = item.get("itemWebUrl", "No link")
 
-                message = f"""
-                🧚 NEW ELINA FOUND
+                message = f"""🧚 NEW ELINA FOUND
 
 Title:
 {title}
@@ -154,11 +165,16 @@ Link:
 {link}
 """
 
-                new_items.append(message)
+                print("NEW ITEM FOUND:", title)
 
+                new_items.append(message)
                 seen.add(item_id)
+            else:
+                print("ALREADY SEEN:", item.get("title", "No title"))
 
     save_seen(seen)
+
+    print("\nTOTAL NEW ITEMS TO SEND:", len(new_items))
 
     for m in new_items:
         send_telegram(m)
@@ -168,13 +184,9 @@ Link:
 # LOOP
 # =========================
 while True:
-
     try:
-
         check()
-
     except Exception as e:
-
         print("Error:", e)
 
     time.sleep(60)
