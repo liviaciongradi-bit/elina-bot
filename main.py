@@ -51,7 +51,6 @@ def send_telegram(text):
 # EBAY TOKEN
 # =========================
 def get_ebay_token():
-
     url = "https://api.ebay.com/identity/v1/oauth2/token"
 
     r = requests.post(
@@ -73,20 +72,17 @@ def get_ebay_token():
 # LOAD SEEN ITEMS
 # =========================
 def load_seen():
-
     if not SEEN_FILE.exists():
         return set()
 
     try:
         data = json.loads(SEEN_FILE.read_text())
         return set(data)
-
     except:
         return set()
 
 
 def save_seen(seen):
-
     SEEN_FILE.write_text(
         json.dumps(list(seen))
     )
@@ -96,7 +92,6 @@ def save_seen(seen):
 # EBAY SEARCH
 # =========================
 def search_ebay(query, token):
-
     url = "https://api.ebay.com/buy/browse/v1/item_summary/search"
 
     headers = {
@@ -112,7 +107,6 @@ def search_ebay(query, token):
     }
 
     r = requests.get(url, headers=headers, params=params)
-
     data = r.json()
 
     return data.get("itemSummaries", [])
@@ -122,38 +116,33 @@ def search_ebay(query, token):
 # MAIN CHECK
 # =========================
 def check():
-    send_telegram("TEST")
-
     token = get_ebay_token()
-
     seen = load_seen()
-
     new_items = []
 
+    # ===== ELINA SEARCH =====
     for term in SEARCH_TERMS:
-
         items = search_ebay(term, token)
 
         for item in items:
-
             item_id = item["itemId"]
 
-            if item_id not in seen:
+            if item_id in seen:
+                continue
 
-                title = item["title"]
+            title = item["title"]
 
-                price_info = item.get("price")
-                if price_info:
-                    price = price_info.get("value", "?")
-                    currency = price_info.get("currency", "")
-                else:
-                    price = "No price"
-                    currency = ""
+            price_info = item.get("price")
+            if price_info:
+                price = price_info.get("value", "?")
+                currency = price_info.get("currency", "")
+            else:
+                price = "No price"
+                currency = ""
 
-                link = item["itemWebUrl"]
+            link = item["itemWebUrl"]
 
-                message = f"""
-🧚 NEW ELINA FOUND
+            message = f"""🧚 NEW ELINA FOUND
 
 Title:
 {title}
@@ -165,9 +154,44 @@ Link:
 {link}
 """
 
-                new_items.append(message)
+            new_items.append(message)
+            seen.add(item_id)
 
-                seen.add(item_id)
+    # ===== SELLER WATCH =====
+    seller_items = search_ebay("Barbie", token)
+
+    for item in seller_items:
+        item_id = item["itemId"]
+
+        if item_id in seen:
+            continue
+
+        seller = item.get("seller", {}).get("username", "")
+
+        if seller.lower() != "carolina-8991":
+            continue
+
+        title = item.get("title", "No title")
+
+        price_info = item.get("price")
+        if price_info:
+            price = price_info.get("value", "?")
+            currency = price_info.get("currency", "")
+        else:
+            price = "No price"
+            currency = ""
+
+        link = item.get("itemWebUrl", "")
+
+        message = f"""👀 NEW FROM SELLER
+
+{title}
+{price} {currency}
+{link}
+"""
+
+        new_items.append(message)
+        seen.add(item_id)
 
     save_seen(seen)
 
@@ -179,13 +203,9 @@ Link:
 # LOOP
 # =========================
 while True:
-
     try:
-
         check()
-
     except Exception as e:
-
         print("Error:", e)
 
     time.sleep(60)
